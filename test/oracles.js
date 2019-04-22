@@ -22,14 +22,14 @@ contract('Oracles', async (accounts) => {
     
     // ARRANGE
     let fee = await config.flightSuretyApp.REGISTRATION_FEE.call();
-
+    
     // ACT
     for(let a=1; a<TEST_ORACLES_COUNT; a++) {      
-      console.log('##############TEST################')
-      console.log(config.flightSuretyApp.registerOracle);
-      //await config.flightSuretyApp.registerOracle.send({ from: accounts[a], value: fee });
-      //let result = await config.flightSuretyApp.getMyIndexes.call({from: accounts[a]});
-      //console.log(`Oracle Registered: ${result[0]}, ${result[1]}, ${result[2]}`);
+      //console.log('##############TEST################')
+      //console.log(config.flightSuretyApp.registerOracle);
+      await config.flightSuretyApp.registerOracle.sendTransaction({ from: accounts[a], value: fee });
+      let result = await config.flightSuretyApp.getMyIndexes.call({from: accounts[a]});
+      console.log(`Oracle Registered: ${result[0]}, ${result[1]}, ${result[2]}`);
     }
   });
 
