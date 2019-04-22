@@ -7,8 +7,10 @@ export default class Contract {
 
         let config = Config[network];
         this.web3 = new Web3(new Web3.providers.HttpProvider(config.url));
-        this.flightSuretyApp = new this.web3.eth.Contract(FlightSuretyApp.abi, config.appAddress);
+        this.flightSuretyApp = new this.web3.eth.Contract(FlightSuretyApp.abi, config.appAddress, config.dataAddress);
         this.initialize(callback);
+        this.x = config.appAddress;
+        this.y = config.dataAddress;
         this.owner = null;
         this.airlines = [];
         this.passengers = [];
@@ -29,10 +31,36 @@ export default class Contract {
                 this.passengers.push(accts[counter++]);
             }
 
+            while(this.flights.length < 5) {
+                this.flights.push({
+                    airline: accts[counter++],
+                    flight: "Flight" + Math.floor((Math.random() * 10) + 1),
+                    timestamp: randomDate(new Date(), new Date(Date.now() + 1000 * 60 * 60 * 2)),
+                });
+            }
             callback();
         });
     }
+    async buy(insurance, flight, callback){
+        let self = this;
+        let amount = self.web3.utils.toWei(insurance, "ether").toString();
+        await self.flightSuretyApp.methods.buy(insurance, flight).send({ from: this.owner, value: amount,  gas:3000000 }, (error, result) => {
+                callback(error, result);
+            });
 
+    }
+
+    async pay(callback){
+        let self = this;
+        await self.flightSuretyApp.methods.pay().send({from: self.owner}, (error, result) => {
+                if(error){
+                    console.log(error);
+                }else {
+                    console.log(result);
+                    callback(result);
+                }
+            });
+    }
     isOperational(callback) {
        let self = this;
        self.flightSuretyApp.methods

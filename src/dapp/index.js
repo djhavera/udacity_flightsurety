@@ -1,4 +1,3 @@
-
 import DOM from './dom';
 import Contract from './contract';
 import './flightsurety.css';
@@ -12,10 +11,10 @@ import './flightsurety.css';
 
         // Read transaction
         contract.isOperational((error, result) => {
-            console.log(error,result);
             console.log(contract.flights);
             contract.flights.forEach(flight => {
                 displayList(flight, DOM.elid("flights"));
+            });
             display('Operational Status', 'Check if contract is operational', [ { label: 'Operational Status', error: error, value: result} ]);
         });
     
@@ -29,12 +28,45 @@ import './flightsurety.css';
             contract.fetchFlightStatus({address: address, flight: flight, time: time}, (error, result) => {
                 display('Oracles', 'Trigger oracles', [ { label: 'Fetch Flight Status', error: error, value: result.flight + ' ' + result.timestamp} ]);
             });
-        })
-    
-    });
-    
+        });
 
-})();
+        DOM.elid('purchase').addEventListener('click', () => {
+            let flight = DOM.elid('flights').value;
+            let insurance = DOM.elid('insurance').value;
+            if (insurance > 0) {
+                contract.buy(insurance, flight, (error, result) => {
+                    alert("Passenger was able to buy insurance.");
+                });
+            } else {
+                alert("Passenger should buy insurance.");
+            }
+        });
+
+        DOM.elid('flights').addEventListener('change', () => {
+            console.log("Hello" + contract.flights);
+            return contract.flights;
+        });
+
+        DOM.elid('withdraw').addEventListener('click', () => {
+            contract.pay((error, result) => {
+                console.log("added funds");
+                display('Withdrwaw', 'Get insurance.', [ { label: 'Get funds', error: error, value: 'success' } ]);
+           });
+        });
+
+
+    });    
+})()
+
+function displayList(flight, parentEl) {
+    console.log(flight);
+    console.log(parentEl);
+    let el = document.createElement("option");
+    el.text = `${flight.flight} - ${new Date((flight.timestamp))}`;
+    el.value = JSON.stringify(flight);
+    parentEl.add(el);
+}
+
 
 function display(title, description, results) {
     let displayDiv = DOM.elid("display-wrapper");
@@ -50,10 +82,3 @@ function display(title, description, results) {
     displayDiv.append(section);
 
 }
-
-
-
-
-
-
-
