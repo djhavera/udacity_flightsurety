@@ -28,8 +28,8 @@ async function test() {
       let r = await flightSuretyApp.methods.registerOracle().send({
           "from": account,
           "value": fee,
-          "gas": 47123880000,
-          "gasPrice": 100000
+          "gas": 4712388,
+          "gasPrice": 100000000000
       });
       let result = await flightSuretyApp.methods.getMyIndexes.call({from: account});
       //console.log(result);
