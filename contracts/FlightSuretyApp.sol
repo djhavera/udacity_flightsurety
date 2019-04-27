@@ -115,10 +115,10 @@ contract FlightSuretyApp {
                             requireIsOperational
                             returns(bool success, uint256 votes)
     {
-        require(flightSuretyData.isAirlineRegistered(msg.sender), "Passenger is not a registered.");
+        require(flightSuretyData.isAirlineRegisteredFunction(msg.sender), "Airline is not a registered.");
         require(flightSuretyData.isAirlineFunded(msg.sender), "Airline is not funded.");
-        require(!flightSuretyData.isAirlineRegistered(_airline), "Airline is already a registered.");
-
+        require(!flightSuretyData.isAirlineRegisteredFunction(_airline), "Airline is already a registered.");
+        
         uint RegisteredAirlinesNumber = flightSuretyData.getRegisteredAirlinesNumberFunction();
         
         if (RegisteredAirlinesNumber >= M) {
@@ -143,7 +143,10 @@ contract FlightSuretyApp {
 
         return (success, 0);
     }
-
+    function sendFundToAirline(address _airline) external payable requireIsOperational
+    {
+        flightSuretyData.fundFunction(_airline, msg.value);
+    }
 
    /**
     * @dev Register a future flight for insuring.
