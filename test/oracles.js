@@ -18,16 +18,15 @@ contract('Oracles', async (accounts) => {
 
   });
 
+
   it('can register oracles', async () => {
     
     // ARRANGE
     let fee = await config.flightSuretyApp.REGISTRATION_FEE.call();
-    
+
     // ACT
     for(let a=1; a<TEST_ORACLES_COUNT; a++) {      
-      //console.log('##############TEST################')
-      //console.log(config.flightSuretyApp.registerOracle);
-      await config.flightSuretyApp.registerOracle.sendTransaction({ from: accounts[a], value: fee });
+      await config.flightSuretyApp.registerOracle({ from: accounts[a], value: fee });
       let result = await config.flightSuretyApp.getMyIndexes.call({from: accounts[a]});
       console.log(`Oracle Registered: ${result[0]}, ${result[1]}, ${result[2]}`);
     }
@@ -40,7 +39,7 @@ contract('Oracles', async (accounts) => {
     let timestamp = Math.floor(Date.now() / 1000);
 
     // Submit a request for oracles to get status information for a flight
-    await config.flightSuretyApp.fetchFlightStatusFunction(config.firstAirline, flight, timestamp);
+    await config.flightSuretyApp.fetchFlightStatus(config.firstAirline, flight, timestamp);
     // ACT
 
     // Since the Index assigned to each test account is opaque by design
@@ -68,6 +67,7 @@ contract('Oracles', async (accounts) => {
 
 
   });
+
 
  
 });
