@@ -11,7 +11,7 @@ web3.eth.defaultAccount = web3.eth.accounts[0];
 let flightSuretyApp = new web3.eth.Contract(FlightSuretyApp.abi, config.appAddress);
 let flightSuretyData = new web3.eth.Contract(FlightSuretyData.abi, config.dataAddress);
 
-let oracle_accounts = [];
+let oracles = [];
 
 const STATUS_CODE_UNKNOWN = 0;
 const STATUS_CODE_ON_TIME = 10;
@@ -31,7 +31,7 @@ async function test() {
           "gas": 4712388,
           "gasPrice": 100000000000
       });
-      let result = await flightSuretyApp.methods.getMyIndexes.call({from: account});
+      let result = await flightSuretyApp.methods.getMyIndexes().call({from: account});
       //console.log(result);
       console.log(`Oracle ${account} registered: ${result[0]}, ${result[1]}, ${result[2]}`);
   });
@@ -66,7 +66,7 @@ flightSuretyApp.events.OracleRequest({
           }
           if (selectedCode.code === 20) {
               console.log("WILL COVER USERS");
-              flightSuretyApp.methods.creditInsurees(
+              flightSuretyApp.methods.creditinsureds(
                   accounts[index],
                   flight
               ).send({
