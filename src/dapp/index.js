@@ -26,40 +26,16 @@ import './flightsurety.css';
             {
                 time: "09:15",
                 timestamp: Math.floor(Date.now() / 1000),
-                target: "Aberdeen",
-                fn: "BD674",
+                target: "Cincinnati",
+                fn: "DL474",
                 airline: contract.owner,
                 status: "0"
             },
             {
                 time: "09:45",
                 timestamp: Math.floor(Date.now() / 1000),
-                target: "Newcastle",
-                fn: "BA1326",
-                airline: contract.owner,
-                status: "0"
-            },
-            {
-                time: "09:55",
-                timestamp: Math.floor(Date.now() / 1000),
-                target: "Durham Tees",
-                fn: "GF5232",
-                airline: contract.owner,
-                status: "0"
-            },
-            {
-                time: "10:05",
-                timestamp: Math.floor(Date.now() / 1000),
-                target: "Dublin",
-                fn: "AA7991",
-                airline: contract.owner,
-                status: "0"
-            },
-            {
-                time: "10:10",
-                timestamp: Math.floor(Date.now() / 1000),
-                target: "Shannon",
-                fn: "AA8017",
+                target: "NYC",
+                fn: "EK1326",
                 airline: contract.owner,
                 status: "0"
             }
@@ -226,4 +202,3 @@ function displayOperationalStatus(status) {
     })
     displayDiv.append(sectionOperationalStatus);
 };
-

@@ -1,20 +1,48 @@
 import FlightSuretyApp from '../../build/contracts/FlightSuretyApp.json';
+import FlightSuretyData from '../../build/contracts/FlightSuretyData.json';
 import Config from './config.json';
 import Web3 from 'web3';
 
 export default class Contract {
     constructor(network, callback) {
 
-        let config = Config[network];
-        this.web3 = new Web3(new Web3.providers.HttpProvider(config.url));
-        this.flightSuretyApp = new this.web3.eth.Contract(FlightSuretyApp.abi, config.appAddress, config.dataAddress);
-        this.initialize(callback);
-        this.x = config.appAddress;
-        this.y = config.dataAddress;
-        this.owner = null;
-        this.airlines = [];
-        this.passengers = [];
-        this.flights = [];
+        async function initilizeProvider() {
+
+          if (window.ethereum) {
+            try {
+              // Request account access
+              await window.ethereum.enable();
+
+              return window.ethereum;;
+            } catch (error) {
+              // User denied account access...
+              console.error("User denied account access")
+            }
+          }
+          // Legacy dapp browsers...
+          else if (window.web3) {
+            return window.web3.currentProvider;
+          }
+          // If no injected web3 instance is detected, fall back to Ganache
+          else {
+            return new Web3.providers.WebsocketProvider(config.url.replace('http', 'ws'));
+          }
+
+        }
+
+        let self = this;
+        initilizeProvider().then(function (provider) {
+          let config = Config[network];
+          self.web3 = new Web3(new Web3.providers.WebsocketProvider(config.url.replace('http', 'ws')));
+          self.web3Metamask = new Web3(provider);
+          self.flightSuretyApp = new self.web3.eth.Contract(FlightSuretyApp.abi, config.appAddress);
+          self.flightSuretyData = new self.web3.eth.Contract(FlightSuretyData.abi, config.dataAddress);
+          self.flightSuretyAppMetamask = new self.web3Metamask.eth.Contract(FlightSuretyApp.abi, config.appAddress);
+          self.initialize(callback, config);
+          self.owner = null;
+          self.airlines = [];
+          self.passengers = [];
+        });
     }
 
     initialize(callback, config) {
@@ -29,36 +57,24 @@ export default class Contract {
             }
 
             while(this.passengers.length < 5) {
-                this.flights.push({
-                    airline: accts[counter++],
-                    flight: "Flight" + Math.floor((Math.random() * 10) + 1),
-                    timestamp: randomDate(new Date(), new Date(Date.now() + 1000 * 60 * 60 * 2)),
-                });
+                this.passengers.push(accts[counter++]);
             }
+
+          this.flightSuretyData.methods
+            .authorizeCaller(config.appAddress)
+            .call({ from: self.owner}, callback);
+
             callback();
         });
-    }
- 
-    async buy(insurance, flight, callback){
-        let self = this;
-        let amount = self.web3.utils.toWei(insurance, "ether").toString();
-        await self.flightSuretyApp.methods.buy(insurance, flight).send({ from: this.owner, value: amount,  gas:3000000 }, (error, result) => {
-                callback(error, result);
-            });
 
+      this.web3Metamask.eth.getAccounts((error, accts) => {
+
+        this.ownerMetamask = accts[0];
+
+        callback();
+      });
     }
 
-    async pay(callback){
-        let self = this;
-        await self.flightSuretyApp.methods.pay().send({from: self.owner}, (error, result) => {
-                if(error){
-                    console.log(error);
-                }else {
-                    console.log(result);
-                    callback(result);
-                }
-            });
-    }
     isOperational(callback) {
        let self = this;
        self.flightSuretyApp.methods
@@ -69,14 +85,75 @@ export default class Contract {
     fetchFlightStatus(flight, callback) {
         let self = this;
         let payload = {
-            airline: self.airlines[0],
-            flight: flight,
-            timestamp: Math.floor(Date.now() / 1000)
-        } 
+            airline: self.owner,
+            flight: flight.fn,
+            timestamp: flight.timestamp
+        }
         self.flightSuretyApp.methods
             .fetchFlightStatus(payload.airline, payload.flight, payload.timestamp)
             .send({ from: self.owner}, (error, result) => {
                 callback(error, payload);
             });
+    }
+
+    oracleReport(callback) {
+       let self = this;
+       self.flightSuretyApp.events.OracleReport({}, function(error, event) {
+            if(error) {
+                console.log(error);
+            } else {
+                callback(event.returnValues);
+            }
+        })
+   }
+
+    flightStatusInfo(callback) {
+        let self = this;
+        self.flightSuretyApp.events.FlightStatusInfo({}, function(error, event) {
+            if(error) {
+                console.log(error);
+            } else {
+                callback(event.returnValues);
+            }
+        })
+    }
+
+    registerFlight(flight, value, callback) {
+      let self = this;
+      self.flightSuretyAppMetamask.methods
+        .registerFlight(flight.airline, flight.fn, flight.timestamp)
+        .send({ from: self.ownerMetamask, value: self.web3.utils.toWei(value, "ether")}, (error, result) => {
+            if(error) {
+              console.log(error);
+            } else {
+              callback(result);
+            }
+          });
+    }
+
+    insuranceBalance(callback) {
+      let self = this;
+      self.flightSuretyApp.methods
+        .insuredBalance()
+        .call({ from: self.ownerMetamask}, function(error, result) {
+          if (error) {
+            console.log(error);
+          } else {
+            callback(self.web3.utils.fromWei(result, "ether"));
+          }
+        })
+    }
+
+    passengerWithdraw(callback) {
+      let self = this;
+      self.flightSuretyApp.methods
+        .withdraw()
+        .send({ from: self.ownerMetamask}, (error, result) => {
+          if (error) {
+            console.log(error);
+          }
+
+          callback();
+        });
     }
 }

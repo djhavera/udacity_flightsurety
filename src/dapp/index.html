@@ -21,23 +21,32 @@
 
     <main class="container">
 
+        <div id="display-user-actions" class="top-20">
+            <section style="margin-bottom: 10px;">
+                <h4>Passenger Actions</h4>
+                <h5>Show balance and withdraw insurance payout</h5>
+            </section>
+            <div class="row">
+                <div class="col-sm-1" style="margin: auto 0px;">Balance</div>
+                <div id="passangerBalance" class="field-value" style="width: 80px; margin: auto 0px;">??? ETH</div>
+                <button id="passengerWithdraw" class="btn btn-success" style="margin: 5px;">Withdraw</button>
+            </div>
+        </div>
+
         <div id="display-wrapper" class="top-20">
-            <div class="row top-20">
-                <label class="form">Flight</label> 
-                Flight number:<input type="text" id="flight-number"> 
-                Address:<input type="text" id="flight-address"> 
-                Timestamp:<input type="text" id="flight-time"> 
-                <btn class="btn btn-primary" id="submit-oracle">Submit</btn>        
-            </div>
-            <div class="row top-20">
-                <label for="flight">Flight Number</label>
-                <select id="flights"></select>
-                <input type="text" id="insurance"/>
-                <button class="btn btn-primary" id="purchase">Purchase Insurance</button>
-            </div>
-            <div class="row top-20">
-                <label for="flight">Withdraw funds</label>
-                <button class="btn btn-primary" id="withdraw">Withdraw Funds</button>
+        </div>
+
+        <div id="display-wrapper-operational" class="top-20">
+        </div>
+
+        <div id="display-wrapper-transactions" class="top-20">
+            <section style="margin-bottom: 10px;">
+                <h5>Transactions</h5>
+            </section>
+            <div>
+                <div class="row">
+                    <div class="col-sm-12 field-value" style="margin: auto 0px;">Not implemented.</div>
+                </div>
             </div>
         </div>
     </main>
