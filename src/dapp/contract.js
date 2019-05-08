@@ -50,6 +50,7 @@ export default class Contract {
 
             this.owner = accts[0];
 
+
             let counter = 1;
 
             while(this.airlines.length < 5) {
@@ -122,7 +123,7 @@ export default class Contract {
       let self = this;
       self.flightSuretyAppMetamask.methods
         .registerFlight(flight.airline, flight.fn, flight.timestamp)
-        .send({ from: self.ownerMetamask, value: self.web3.utils.toWei(value, "ether")}, (error, result) => {
+        .send({ from: self.owner, value: self.web3.utils.toWei(value, "ether")}, (error, result) => {
             if(error) {
               console.log(error);
             } else {
@@ -135,7 +136,7 @@ export default class Contract {
       let self = this;
       self.flightSuretyApp.methods
         .insuredBalance()
-        .call({ from: self.ownerMetamask}, function(error, result) {
+        .call({ from: self.owner}, function(error, result) {
           if (error) {
             console.log(error);
           } else {
@@ -148,7 +149,7 @@ export default class Contract {
       let self = this;
       self.flightSuretyApp.methods
         .withdraw()
-        .send({ from: self.ownerMetamask}, (error, result) => {
+        .send({ from: self.owner}, (error, result) => {
           if (error) {
             console.log(error);
           }
