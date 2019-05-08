@@ -62,7 +62,7 @@ export default class Contract {
 
           this.flightSuretyData.methods
             .authorizeCaller(config.appAddress)
-            .call({ from: self.owner}, callback);
+            .send({ from: self.owner}, callback);
 
             callback();
         });
