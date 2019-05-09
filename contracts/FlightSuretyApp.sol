@@ -119,60 +119,51 @@ contract FlightSuretyApp {
     * @dev Add an airline to the registration queue
     *
     */
-    function registerAirline
-                            (
-                                address _airline
-                            )
-                            external
-                            requireIsOperational
-                            //requireIsCallerAirlineRegistered
-                            requireIsCallerAirlineFunded
+
+    function registerAirline(address _airline) external requireIsOperational
     {
-        bool success = false;
+        flightSuretyData.registerAirline(msg.sender, _airline);
+    }
+        //require(flightSuretyData.isAirlineFunded(msg.sender), "Airline is not funded.");
+        //require(!flightSuretyData.isAirlineRegistered(_airline), "Airline is already a registered.");
 
-        if(airlinesRegisteredCount < MULTIPARTY_CONSENSUS_THRESHOLD) {
-            success = flightSuretyData.registerAirline(msg.sender, _airline);
-            if(success) {
-                airlinesRegisteredCount++;
-            }
-        } else {
+        /*uint noOfRegisteredAirlines = flightSuretyData.getNoOfRegisteredAirlines();
+        
+        if (noOfRegisteredAirlines >= M) {
             bool isDuplicate = false;
-
-            for(uint c = 0; c < airlineVotes[_airline].length; c++) {
-                if (airlineVotes[_airline][c] == msg.sender) {
+            for (uint c = 0; c < flightSuretyData.getMultiCallsLength(); c++) {
+                if (flightSuretyData.getMultiCallsItem(c) == msg.sender) {
                     isDuplicate = true;
                     break;
                 }
             }
-            require(!isDuplicate, "Multivotes not allowed");
+            require(!isDuplicate, "Caller has already called this function.");
 
-            airlineVotes[_airline].push(msg.sender);
-            if (airlineVotes[_airline].length >= airlinesRegisteredCount.div(2)) {
+            flightSuretyData.setMultiCallsItem(msg.sender);
 
-                success = flightSuretyData.registerAirline(msg.sender, _airline);
-                if(success) {
-                    airlinesRegisteredCount++;
-                }
-
-                airlineVotes[_airline] = new address[](0);
+            if (flightSuretyData.getMultiCallsLength() >= noOfRegisteredAirlines.div(2)) {// 50%
+                flightSuretyData.clearMultiCalls();
+                flightSuretyData.registerAirline(_airline);
             }
+        } else {
+            flightSuretyData.registerAirline(_airline);
         }
+
+        return (success, 0);
     }
+    */
 
     function fund
-                            (
-                            //address _airline
-                            )
-                            public
-                            payable
-                            requireIsOperational
-    {
-        //require(msg.value >= INSURANCE_BUYIN, "TESTTTTTT");
-
-        //flightSuretyData.fundAirline(_airline, msg.value);
-        address(flightSuretyData).transfer(msg.value);
-        flightSuretyData.fundAirline(msg.sender);
+                        (
+                            address _airline
+                        ) 
+                        external 
+                        payable 
+                        requireIsOperational 
+    { 
+        flightSuretyData.fundAirline(_airline, msg.value); 
     }
+    
 
     function insuredBalance
                             (
