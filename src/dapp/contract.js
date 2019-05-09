@@ -48,7 +48,7 @@ export default class Contract {
     initialize(callback, config) {
         this.web3.eth.getAccounts((error, accts) => {
 
-            this.owner = accts[0];
+            this.owner = self.owner = accts[0];
 
 
             let counter = 1;
@@ -63,9 +63,14 @@ export default class Contract {
 
           this.flightSuretyData.methods
             .authorizeCaller(config.appAddress)
-            .send({ from: self.owner}, callback);
+            .send({from: self.owner}, callback);
 
-            callback();
+
+          this.flightSuretyApp.methods 
+          .fund() 
+          .send({from: self.owner, value: web3.utils.toWei("10", "ether").toString(), gasPrice: 0}, callback);
+          
+          callback();
         });
 
       this.web3Metamask.eth.getAccounts((error, accts) => {
@@ -80,7 +85,7 @@ export default class Contract {
        let self = this;
        self.flightSuretyApp.methods
             .isOperational()
-            .call({ from: self.owner}, callback);
+            .call({from: self.owner}, callback);
     }
 
     fetchFlightStatus(flight, callback) {
@@ -140,7 +145,7 @@ export default class Contract {
           if (error) {
             console.log(error);
           } else {
-            callback(self.web3.utils.fromWei(result, "ether"));
+            callback(self.web3.utils.fromWei(result, "ether").toString());
           }
         })
     }
