@@ -12,15 +12,26 @@ let flightSuretyApp = new web3.eth.Contract(FlightSuretyApp.abi, config.appAddre
 let flightSuretyData = new web3.eth.Contract(FlightSuretyData.abi, config.dataAddress);
 
 let oracles = [];
-let STATUS_CODES = [];
-
-const STATUS_CODE_UNKNOWN = 0;
-const STATUS_CODE_ON_TIME = 10;
-const STATUS_CODE_LATE_AIRLINE = 20;
-const STATUS_CODE_LATE_WEATHER = 30;
-const STATUS_CODE_LATE_TECHNICAL = 40;
-const STATUS_CODE_LATE_OTHER = 50;
-
+let STATUS_CODES = [{
+        "label": "STATUS_CODE_UNKNOWN",
+        "code": 0
+    }, {
+        "label": "STATUS_CODE_ON_TIME",
+        "code": 10
+    }, {
+        "label": "STATUS_CODE_LATE_AIRLINE",
+        "code": 20
+    }, {
+        "label": "STATUS_CODE_LATE_WEATHER",
+        "code": 30
+    }, {
+        "label": "STATUS_CODE_LATE_TECHNICAL",
+        "code": 40
+    }, {
+        "label": "STATUS_CODE_LATE_OTHER",
+        "code": 50
+    }];
+    
 async function test() {
   let fee = await flightSuretyApp.methods.REGISTRATION_FEE().call();
   let accounts = await web3.eth.getAccounts();
@@ -34,6 +45,7 @@ async function test() {
       });
       let result = await flightSuretyApp.methods.getMyIndexes().call({from: account});
       //console.log(result);
+      oracles.push(result);
       console.log(`Oracle ${account} registered: ${result[0]}, ${result[1]}, ${result[2]}`);
   });
 }
