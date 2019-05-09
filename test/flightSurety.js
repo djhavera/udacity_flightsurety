@@ -107,26 +107,32 @@ contract('Flight Surety Tests', async (accounts) => {
     //let fund = await config.flightSuretyApp.INSURANCE_BUYIN.call();
 
     // ACT
+    let newAirline = accounts[3];
     let reverted = false;
     let balance = 0;
     let fund = 0;
+    //let fund = await config.flightSuretyApp.fund(newAirline,{from: config.firstAirline, value: web3.utils.toWei("10", "ether").toString(), gasPrice: 0});
+    await config.flightSuretyApp.fund(newAirline,{from: config.firstAirline, value: web3.utils.toWei("10", "ether").toString(), gasPrice: 0});
+    // console.log('########## FUND ###########')
+    //console.log(fund.toString());
+    console.log('########## BALANCE ###########')
+    balance = await config.flightSuretyData.getBalance(newAirline,{from: config.firstAirline}).toString();
+    console.log(balance.toString());
     try {
-        balance = await config.flightSuretyData.getBalance({from: config.owner});
-        let fund = 10;
-        await config.flightSuretyApp.fund({from: config.firstAirline, value: fund.toString(), gasPrice: 0});
-        
+        //await config.flightSuretyApp.fund(newAirline,{from: config.firstAirline, value: web3.utils.toWei("10", "ether").toString(), gasPrice: 0});
+        await config.flightSuretyApp.registerAirline.call(newAirline, {from: config.firstAirline});
+        //await config.flightSuretyApp.registerAirline.call(newAirline, {from: config.firstAirline});
     }
     catch(e) {
-        console.log(e);
         reverted = true;
     }
 
     // ASSERT
-    assert.equal(balance.toString(10), fund.toString(), "Your Balance is: ");
-    assert.equal(reverted, false, "Airline needs more ETH");
+    assert.equal(reverted, false, "Airline could not register.");
+
   });
-
-
+ 
+/*
   it('(airline) can register an Airline using registerAirline() if it is funded', async () => {
 
     // ARRANGE
@@ -135,6 +141,7 @@ contract('Flight Surety Tests', async (accounts) => {
     // ACT
     let reverted = false;
     try {
+        //await config.flightSuretyApp.fund(newAirline,{from: config.firstAirline, value: web3.utils.toWei("10", "ether").toString(), gasPrice: 0});
         await config.flightSuretyApp.registerAirline(newAirline, {from: config.firstAirline});
     }
     catch(e) {
@@ -146,7 +153,7 @@ contract('Flight Surety Tests', async (accounts) => {
   });
 
   
- 
+
 it('(airline) airlines can register without consensus until M reached', async () => {
 
     // ARRANGE
@@ -171,9 +178,9 @@ it('(airline) airlines can register without consensus until M reached', async ()
 
     // ASSERT
     assert.equal(registerBelowThreshold, true, "Can not register");
-    assert.equal(await config.flightSuretyApp.airlinesRegisteredCount.call(), 4, "Threshold ignored");
+    assert.equal(await config.flightSuretyApp.airlinesRegisteredCount.call(), 4, "You didn't meet the threshold of 4");
   });
-
+*/
  
  
 
